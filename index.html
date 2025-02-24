@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Games Hub</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #ecf0f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .difficulty {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            border-bottom-left-radius: 5px;
+        }
+
+        .beginner .difficulty {
+            background-color: #2ecc71;
+        }
+
+        .intermediate .difficulty {
+            background-color: #f1c40f;
+        }
+
+        .advanced .difficulty {
+            background-color: #e67e22;
+        }
+
+        .expert .difficulty {
+            background-color: #c0392b;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .game-card h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .game-card p {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .play-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .play-btn:hover {
+            background-color: #c0392b;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>&lt;DevGames/&gt;</h1>
+            <p class="subtitle">Take a break and level up your coding fun!</p>
+        </header>
+
+        <main class="games-grid">
+            <!-- Beginner Level Games -->
+            <div class="game-card beginner">
+                <span class="difficulty">Beginner</span>
+                <h2>Code Pattern Memory</h2>
+                <p>Test your memory by matching pairs of coding syntax and symbols. How many patterns can you remember?</p>
+                <a href="memory-game.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card beginner">
+                <span class="difficulty">Beginner</span>
+                <h2>Quick Math</h2>
+                <p>Solve simple math problems against the clock. Perfect for keeping your mind sharp!</p>
+                <a href="quick-math.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Intermediate Level Games -->
+            <div class="game-card intermediate">
+                <span class="difficulty">Intermediate</span>
+                <h2>Algorithm Puzzle</h2>
+                <p>Solve algorithmic challenges by arranging code blocks in the correct order. Race against time!</p>
+                <a href="algorithm-puzzle.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card intermediate">
+                <span class="difficulty">Intermediate</span>
+                <h2>Word Scramble</h2>
+                <p>Unscramble programming terms and common words. Test your vocabulary and quick thinking!</p>
+                <a href="word-scramble.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Advanced Level Games -->
+            <div class="game-card advanced">
+                <span class="difficulty">Advanced</span>
+                <h2>Command Line Race</h2>
+                <p>Type terminal commands as fast as you can! Practice your CLI skills while having fun.</p>
+                <a href="command-line-race.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card advanced">
+                <span class="difficulty">Advanced</span>
+                <h2>Regex Runner</h2>
+                <p>Race against time to write regular expressions that match given patterns. Master the art of regex!</p>
+                <a href="regex-runner.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Expert Level Games -->
+            <div class="game-card expert">
+                <span class="difficulty">Expert</span>
+                <h2>Git Branch Challenge</h2>
+                <p>Navigate through a maze of git branches and commits. Can you resolve all the merge conflicts?</p>
+                <a href="git-branch-challenge.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card expert">
+                <span class="difficulty">Expert</span>
+                <h2>Code Debugger</h2>
+                <p>Find and fix bugs in complex code snippets. Put your debugging skills to the ultimate test!</p>
+                <a href="code-debugger.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Non-Developer Games - Beginner -->
+            <div class="game-card beginner">
+                <span class="difficulty">Beginner</span>
+                <h2>Memory Match</h2>
+                <p>Classic memory game with colorful cards. Train your memory and concentration skills!</p>
+                <a href="memory-match.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card beginner">
+                <span class="difficulty">Beginner</span>
+                <h2>Color Guess</h2>
+                <p>Test your color perception by matching RGB values to displayed colors.</p>
+                <a href="color-guess.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Non-Developer Games - Intermediate -->
+            <div class="game-card intermediate">
+                <span class="difficulty">Intermediate</span>
+                <h2>Pattern Sequence</h2>
+                <p>Remember and repeat growing sequences of patterns and colors. How far can you go?</p>
+                <a href="pattern-sequence.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card intermediate">
+                <span class="difficulty">Intermediate</span>
+                <h2>Speed Typing</h2>
+                <p>Improve your typing speed and accuracy with fun challenges and quotes!</p>
+                <a href="speed-typing.html" class="play-btn">Play Now</a>
+            </div>
+
+            <!-- Non-Developer Games - Advanced -->
+            <div class="game-card advanced">
+                <span class="difficulty">Advanced</span>
+                <h2>Puzzle Master</h2>
+                <p>Solve increasingly complex sliding puzzles with beautiful images.</p>
+                <a href="puzzle-master.html" class="play-btn">Play Now</a>
+            </div>
+
+            <div class="game-card advanced">
+                <span class="difficulty">Advanced</span>
+                <h2>Logic Gates</h2>
+                <p>Challenge your logical thinking with complex puzzles using AND, OR, and NOT gates.</p>
+                <a href="logic-gates.html" class="play-btn">Play Now</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created with ❤️ for developers who need a fun break</p>
+        </footer>
+    </div>
+    <script src="js/game-filter.js"></script>
+</body>
+</html>

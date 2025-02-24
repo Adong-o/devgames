@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Pattern Memory Game</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --card-color: #34495e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            aspect-ratio: 3/4;
+            background-color: var(--card-color);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: transform 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-color);
+            border-radius: 8px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: var(--secondary-color);
+        }
+
+        .restart-btn {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-btn">← Back to Games</a>
+    
+    <div class="game-header">
+        <h1>Code Pattern Memory</h1>
+        <div class="game-stats">
+            <div class="stat">Level: <span id="level">1</span></div>
+            <div class="stat">Score: <span id="score">0</span></div>
+            <div class="stat">High Score: <span id="highScore">0</span></div>
+            <div class="stat">Moves: <span id="moves">0</span></div>
+            <div class="stat">Pairs Found: <span id="pairs">0</span>/8</div>
+            <div class="stat">Time: <span id="time">0:00</span></div>
+        </div>
+    </div>
+
+    <div class="memory-grid" id="gameGrid"></div>
+    <button class="restart-btn" onclick="restartGame()">Restart Game</button>
+
+    <script>
+        const symbols = [
+            '{ }', '[ ]', '( )', '=>', '&&', '||', '!=', '==',
+            '{ }', '[ ]', '( )', '=>', '&&', '||', '!=', '=='
+        ];
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let gameStarted = false;
+        let timer;
+        let seconds = 0;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createCard(symbol, index) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.index = index;
+            card.innerHTML = `
+                <div class="card-front">?</div>
+                <div class="card-back">${symbol}</div>
+            `;
+            card.addEventListener('click', () => flipCard(card));
+            return card;
+        }
+
+        function flipCard(card) {
+            if (!gameStarted) {
+                startTimer();
+                gameStarted = true;
+            }
+
+            if (flippedCards.length === 2 || card.classList.contains('flipped') || 
+                card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const match = card1.querySelector('.card-back').textContent === 
+                         card2.querySelector('.card-back').textContent;
+
+            if (match) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                document.getElementById('pairs').textContent = matchedPairs;
+                if (matchedPairs === 8) endGame();
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 1000);
+            }
+
+            flippedCards = [];
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                document.getElementById('time').textContent = 
+                    `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            setTimeout(() => {
+                alert(`Congratulations! You won in ${moves} moves and ${seconds} seconds!`);
+            }, 500);
+        }
+
+        function restartGame() {
+            clearInterval(timer);
+            seconds = 0;
+            moves = 0;
+            matchedPairs = 0;
+            gameStarted = false;
+            document.getElementById('moves').textContent = '0';
+            document.getElementById('pairs').textContent = '0';
+            document.getElementById('time').textContent = '0:00';
+            initializeGame();
+        }
+
+        function initializeGame() {
+            const gameGrid = document.getElementById('gameGrid');
+            gameGrid.innerHTML = '';
+            const shuffledSymbols = shuffleArray([...symbols]);
+            shuffledSymbols.forEach((symbol, index) => {
+                gameGrid.appendChild(createCard(symbol, index));
+            });
+        }
+
+        initializeGame();
+    </script>
+    <script src="js/game-utils.js"></script>
+    <script src="js/image-utils.js"></script>
+    <script src="js/memory-symbols.js"></script>
+    <script src="js/memory-game.js"></script>
+</body>
+</html>

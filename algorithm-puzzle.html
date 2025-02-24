@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Puzzle</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --block-color: #34495e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .puzzle-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .code-blocks {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .code-block {
+            background-color: var(--block-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            cursor: move;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .code-block.dragging {
+            opacity: 0.5;
+            background-color: var(--secondary-color);
+        }
+
+        .solution-area {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 5px;
+            min-height: 400px;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .check-btn {
+            background-color: var(--accent-color);
+        }
+
+        .check-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .next-btn {
+            background-color: var(--secondary-color);
+        }
+
+        .next-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .problem-description {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-btn">← Back to Games</a>
+
+    <div class="game-header">
+        <h1>Algorithm Puzzle</h1>
+        <div class="game-stats">
+            <div class="stat">Level: <span id="level">1</span></div>
+            <div class="stat">Score: <span id="score">0</span></div>
+            <div class="stat">Time: <span id="time">0:00</span></div>
+        </div>
+    </div>
+
+    <div class="problem-description" id="problemDescription">
+        Arrange the code blocks to create a function that finds the maximum number in an array.
+    </div>
+
+    <div class="puzzle-container">
+        <div class="code-blocks" id="codeBlocks"></div>
+        <div class="solution-area" id="solutionArea"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn check-btn" onclick="checkSolution()">Check Solution</button>
+        <button class="btn next-btn" onclick="nextLevel()" disabled>Next Level</button>
+    </div>
+
+    <script>
+        const problems = [
+            {
+                description: 'Arrange the code blocks to create a function that finds the maximum number in an array.',
+                blocks: [
+                    'function findMax(arr) {',
+                    '    let max = arr[0];',
+                    '    for(let i = 1; i < arr.length; i++) {',
+                    '        if(arr[i] > max) {',
+                    '            max = arr[i];',
+                    '        }',
+                    '    }',
+                    '    return max;',
+                    '}'
+                ],
+                solution: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+            },
+            {
+                description: 'Create a function that reverses a string.',
+                blocks: [
+                    'function reverseString(str) {',
+                    '    let reversed = "";',
+                    '    for(let i = str.length - 1; i >= 0; i--) {',
+                    '        reversed += str[i];',
+                    '    }',
+                    '    return reversed;',
+                    '}'
+                ],
+                solution: [0, 1, 2, 3, 4, 5, 6]
+            }
+        ];
+
+        let currentLevel = 0;
+        let score = 0;
+        let timer;
+        let seconds = 0;
+
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                document.getElementById('time').textContent = 
+                    `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function initializeLevel() {
+            const problem = problems[currentLevel];
+            document.getElementById('problemDescription').textContent = problem.description;
+            document.getElementById('level').textContent = currentLevel + 1;
+
+            const codeBlocks = document.getElementById('codeBlocks');
+            const solutionArea = document.getElementById('solutionArea');
+            codeBlocks.innerHTML = '';
+            solutionArea.innerHTML = '';
+
+            const shuffledBlocks = [...problem.blocks].sort(() => Math.random() - 0.5);
+            shuffledBlocks.forEach((block, index) => {
+                const blockElement = createCodeBlock(block, index);
+                codeBlocks.appendChild(blockElement);
+            });
+
+            document.querySelector('.next-btn').disabled = true;
+        }
+
+        function createCodeBlock(content, index) {
+            const block = document.createElement('div');
+            block.className = 'code-block';
+            block.textContent = content;
+            block.draggable = true;
+            block.dataset.index = index;
+
+            block.addEventListener('dragstart', dragStart);
+            block.addEventListener('dragend', dragEnd);
+            return block;
+        }
+
+        function dragStart(e) {
+            e.target.classList.add('dragging');
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function checkSolution() {
+            const solutionArea = document.getElementById('solutionArea');
+            const currentSolution = Array.from(solutionArea.children)
+                .map(block => parseInt(block.dataset.index));
+
+            const problem = problems[currentLevel];
+            const isCorrect = JSON.stringify(currentSolution) === JSON.stringify(problem.solution);
+
+            if (isCorrect) {
+                score += Math.max(100 - seconds, 10);
+                document.getElementById('score').textContent = score;
+                document.querySelector('.next-btn').disabled = false;
+                alert('Correct! Well done!');
+            } else {
+                alert('Not quite right. Try again!');
+            }
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            if (currentLevel < problems.length) {
+                seconds = 0;
+                document.getElementById('time').textContent = '0:00';
+                initializeLevel();
+            } else {
+                alert(`Game Complete! Final Score: ${score}`);
+                currentLevel = 0;
+                score = 0;
+                document.getElementById('score').textContent = '0';
+                initializeLevel();
+            }
+        }
+
+        // Initialize drag and drop
+        const solutionArea = document.getElementById('solutionArea');
+
+        solutionArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                solutionArea.appendChild(draggable);
+            }
+        });
+
+        document.getElementById('codeBlocks').addEventListener('dragover', e => {
+            e.preventDefault();
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                document.getElementById('codeBlocks').appendChild(draggable);
+            }
+        });
+
+        // Start game
+        initializeLevel();
+        startTimer();
+    </script>
+</body>
+</html>
